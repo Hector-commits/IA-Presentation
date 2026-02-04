@@ -212,6 +212,8 @@
             width: 100%;
             height: 100%;
             position: relative;
+            overflow: hidden;
+            /* Para que las slides no se salgan durante el translateX */
         }
 
         .slide {
@@ -221,29 +223,85 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.8s ease-in-out;
+            transform: translateX(100%);
+            /* Empieza fuera a la derecha */
+            transition: transform 1.8s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 1.8s cubic-bezier(0.23, 1, 0.32, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Centra el texto */
+            overflow: hidden;
+            /* Para el efecto Ken Burns */
         }
 
         .slide.active-slide {
             opacity: 1;
+            transform: translateX(0);
+            /* Se mueve al centro */
             z-index: 1;
         }
 
+        /* Slide que sale (anterior) */
+        .slide.slide-exit {
+            transform: translateX(-100%);
+            /* Sale por la izquierda */
+            opacity: 0;
+        }
+
         .slide-image-bg {
+            position: absolute;
+            top: -5%;
+            /* Extra espacio para el zoom */
+            left: -5%;
+            width: 110%;
+            /* 10% más grande para evitar bordes blancos */
+            height: 110%;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            /* Eliminamos el filter brightness para usar el vignette dinámico */
+        }
+
+        /* Efecto Ken Burns mejorado - zoom y paneo lento */
+        .slide.active-slide .slide-image-bg {
+            animation: kenBurnsEffect 25s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurnsEffect {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            25% {
+                transform: scale(1.08) translate(2%, -1%);
+            }
+
+            50% {
+                transform: scale(1.12) translate(-1%, 2%);
+            }
+
+            75% {
+                transform: scale(1.15) translate(1%, 1%);
+            }
+
+            100% {
+                transform: scale(1.18) translate(-2%, -2%);
+            }
+        }
+
+        /* Vignette Dinámica - oscurece bordes, mantiene centro vibrante */
+        .slide-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
-            filter: brightness(0.4);
-            /* Oscurece la imagen para leer texto */
+            background: radial-gradient(ellipse at center,
+                    rgba(0, 0, 0, 0.3) 0%,
+                    rgba(0, 0, 0, 0.5) 40%,
+                    rgba(0, 0, 0, 0.9) 100%);
+            z-index: 1;
+            pointer-events: none;
         }
 
         /* --- VARIABLES DE SECCIÓN --- */
@@ -260,16 +318,16 @@
             z-index: 2;
             max-width: 800px;
             width: fit-content;
-            /* Se ajusta al contenido */
             margin: 0 auto;
-            /* Centrado horizontal si es bloque */
             text-align: center;
             padding: 30px 50px;
-            /* Ajustado para que no sobre tanto espacio vertical */
-            background: rgba(15, 23, 42, 0.85);
+
+            /* Glassmorphism mejorado */
+            background: rgba(15, 23, 42, 0.4);
+            /* Más translúcido */
 
             /* Borde base sutil */
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
 
             /* DOBLE MARCO Y GLOW */
@@ -279,9 +337,29 @@
                 0 0 20px var(--section-accent),
                 0 20px 50px rgba(0, 0, 0, 0.8);
 
-            backdrop-filter: blur(15px);
-            transform: translateY(20px);
-            animation: floatUp 0.8s forwards;
+            /* Blur más fuerte para glassmorphism */
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
+
+            /* Aparición escalonada - delay */
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.8s,
+                transform 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.8s;
+        }
+
+        /* Cuando el slide está activo, el contenido aparece después */
+        .slide.active-slide .slide-content-box {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Animación de salida para el content box */
+        .slide-content-box.slide-exiting {
+            opacity: 0 !important;
+            transform: translateY(-30px) scale(0.9) !important;
+            transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                transform 0.5s cubic-bezier(0.23, 1, 0.32, 1) !important;
         }
 
         /* Decoración de esquinas tech */
@@ -292,7 +370,6 @@
             left: 50%;
             transform: translateX(-50%);
             width: 70%;
-            /* Un poco más corto */
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--section-accent), transparent);
             opacity: 0.7;
@@ -304,34 +381,6 @@
 
         .slide-content-box::after {
             bottom: 8px;
-        }
-
-        @keyframes floatUp {
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        /* Aplica la animación solo cuando el slide está activo */
-        .slide.active-slide .slide-image-bg {
-            animation: intenseZoomFade 20s ease-out forwards;
-        }
-
-        @keyframes intenseZoomFade {
-            0% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-
-            60% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1.5);
-                opacity: 0.6;
-            }
         }
 
         .step-number {
@@ -371,9 +420,10 @@
         }
 
         .slide-content-box.hidden-box {
-            opacity: 0;
-            /* Mantenemos pointer-events activos para poder clicar y volver a mostrarla */
-            transition: opacity 0.5s ease;
+            opacity: 0 !important;
+            pointer-events: none;
+            transform: translateY(30px) scale(0.95) !important;
+            transition: opacity 0.4s ease, transform 0.4s ease !important;
         }
 
         /* BOTONES DE NAV */
@@ -773,13 +823,45 @@
         function openSection(id) {
             document.getElementById(id).classList.add('active');
             currentSectionId = id;
-            currentSlideIndex = 0;
+            currentSlideIndex = -1; // Forzar a que no sea 0 para que showSlide funcione
             showSlide(0); // Initialize/Reset
         }
 
         function closeSection(id) {
-            document.getElementById(id).classList.remove('active');
+            // Resetear todas las slides de esta sección
+            const section = document.getElementById(id);
+            if (section) {
+                const slides = section.querySelectorAll('.slide');
+                const dots = section.querySelectorAll('.dot');
+
+                // Remover clases activas de todas las slides
+                slides.forEach((s, index) => {
+                    s.classList.remove('active-slide', 'slide-exit');
+                    const contentBox = s.querySelector('.slide-content-box');
+                    if (contentBox) {
+                        contentBox.classList.remove('slide-exiting', 'hidden-box');
+                    }
+                    // Solo la primera slide debe estar activa al volver
+                    if (index === 0) {
+                        s.classList.add('active-slide');
+                    }
+                });
+
+                // Resetear dots
+                dots.forEach((d, index) => {
+                    d.classList.remove('active');
+                    if (index === 0) {
+                        d.classList.add('active');
+                    }
+                });
+
+                // Cerrar la sección
+                section.classList.remove('active');
+            }
+
+            // Resetear variables globales
             currentSectionId = null;
+            currentSlideIndex = 0;
         }
 
         function getSlides() {
@@ -797,39 +879,71 @@
             const dots = getDots();
             if (slides.length === 0) return;
 
-            // Remove active classes
-            slides.forEach(s => s.classList.remove('active-slide'));
-            dots.forEach(d => d.classList.remove('active'));
+            // Calcular el índice del nuevo slide
+            let newSlideIndex;
+            if (n >= slides.length) newSlideIndex = 0;
+            else if (n < 0) newSlideIndex = slides.length - 1;
+            else newSlideIndex = n;
 
-            // Circular logic
-            if (n >= slides.length) currentSlideIndex = 0;
-            else if (n < 0) currentSlideIndex = slides.length - 1;
-            else currentSlideIndex = n;
+            // Si es el mismo slide, no hacer nada
+            if (newSlideIndex === currentSlideIndex) return;
 
-            // Add active classes
-            slides[currentSlideIndex].classList.add('active-slide');
-            if (dots.length > 0) dots[currentSlideIndex].classList.add('active');
+            // Obtener el slide actual y su content box
+            const currentSlide = slides[currentSlideIndex];
+            const currentContentBox = currentSlide ? currentSlide.querySelector('.slide-content-box') : null;
 
-            // Button Logic
-            const nextBtn = document.querySelector(`#${currentSectionId} .next-btn`);
-            const prevBtn = document.querySelector(`#${currentSectionId} .prev-btn`);
+            // Función para completar la transición
+            const completeTransition = () => {
+                // Remove active classes
+                slides.forEach(s => s.classList.remove('active-slide'));
+                dots.forEach(d => d.classList.remove('active'));
 
-            if (nextBtn) {
-                if (currentSlideIndex === slides.length - 1) {
-                    nextBtn.innerText = "Fin ↺";
-                } else {
-                    nextBtn.innerText = "Siguiente ❯";
+                // Actualizar índice
+                currentSlideIndex = newSlideIndex;
+
+                // Add active classes
+                slides[currentSlideIndex].classList.add('active-slide');
+                if (dots.length > 0) dots[currentSlideIndex].classList.add('active');
+
+                // Button Logic
+                const nextBtn = document.querySelector(`#${currentSectionId} .next-btn`);
+                const prevBtn = document.querySelector(`#${currentSectionId} .prev-btn`);
+
+                if (nextBtn) {
+                    if (currentSlideIndex === slides.length - 1) {
+                        nextBtn.innerText = "Fin ↺";
+                    } else {
+                        nextBtn.innerText = "Siguiente ❯";
+                    }
                 }
-            }
-            if (prevBtn) {
-                prevBtn.style.visibility = (currentSlideIndex === 0) ? 'hidden' : 'visible';
+                if (prevBtn) {
+                    prevBtn.style.visibility = (currentSlideIndex === 0) ? 'hidden' : 'visible';
+                }
+            };
+
+            // Si hay un content box y no está oculto, animarlo saliendo primero
+            if (currentContentBox && !currentContentBox.classList.contains('hidden-box')) {
+                currentContentBox.classList.add('slide-exiting');
+
+                // Esperar a que termine la animación de salida del contenido (500ms)
+                setTimeout(() => {
+                    currentContentBox.classList.remove('slide-exiting');
+                    completeTransition();
+                }, 600); // 500ms animación + 100ms margen
+            } else {
+                // Si no hay content box o ya está oculto, transicionar directamente
+                completeTransition();
             }
         }
 
         function nextSlide() {
             const slides = getSlides();
             if (currentSlideIndex === slides.length - 1) {
-                closeSection(currentSectionId);
+                // En la última slide, cerrar la sección (volver al inicio)
+                const sectionToClose = currentSectionId;
+                if (sectionToClose) {
+                    closeSection(sectionToClose);
+                }
             } else {
                 showSlide(currentSlideIndex + 1);
             }
@@ -846,7 +960,18 @@
         // Box toggle logic for all boxes
         document.querySelectorAll('.slide-content-box').forEach(box => {
             box.addEventListener('click', function (e) {
+                e.stopPropagation(); // Evitar que el evento llegue al slide
                 this.classList.toggle('hidden-box');
+            });
+        });
+
+        // Click en el slide para mostrar la caja si está oculta
+        document.querySelectorAll('.slide').forEach(slide => {
+            slide.addEventListener('click', function (e) {
+                const contentBox = this.querySelector('.slide-content-box');
+                if (contentBox && contentBox.classList.contains('hidden-box')) {
+                    contentBox.classList.remove('hidden-box');
+                }
             });
         });
 
