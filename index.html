@@ -426,7 +426,7 @@
     <button class="music-btn" onclick="toggleMusic()">
         🎵 Play Music
     </button>
-    <audio id="bg-music" loop>
+    <audio id="bg-music" loop autoplay>
         <source src="./audio/soundtrack.mp3" type="audio/mpeg">
         Tu navegador no soporta el elemento de audio.
     </audio>
@@ -581,6 +581,24 @@
 
         // Establecer volumen inicial
         music.volume = 0.5;
+
+        // Intentar reproducir automáticamente al cargar
+        window.addEventListener('load', () => {
+            const playPromise = music.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // La reproducción automática comenzó
+                    musicBtn.classList.add('playing');
+                    musicBtn.innerHTML = '❚❚ PAUSE';
+                })
+                    .catch(error => {
+                        // La reproducción automática fue bloqueada
+                        console.log("Autoplay bloqueado por el navegador. Se requiere interacción.");
+                        // No cambiamos el botón, el usuario deberá hacer clic
+                    });
+            }
+        });
 
         function toggleMusic() {
             if (music.paused) {
