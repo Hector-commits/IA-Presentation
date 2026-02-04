@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presentación IA - Héctor</title>
+    <link rel="icon" type="image/png" href="./images/DragonBall_neutral.png">
     <style>
         /* --- ESTILOS GENERALES (CYBERPUNK / FUTURISTA) --- */
         :root {
@@ -366,9 +367,69 @@
             transform: scale(1.3);
         }
     </style>
+    <style>
+        /* Music Button Styles */
+        .music-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .music-btn:hover {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .music-btn.playing {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+            animation: pulse-music 2s infinite;
+        }
+
+        @keyframes pulse-music {
+            0% {
+                box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(249, 115, 22, 0.8);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+            }
+        }
+    </style>
 </head>
 
 <body>
+
+    <button class="music-btn" onclick="toggleMusic()">
+        🎵 Play Music
+    </button>
+    <audio id="bg-music" loop>
+        <source src="./audio/soundtrack.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
 
     <div id="home-screen">
         <div class="option-container" onclick="handleOptionClick(event, 'section-personal', 'orange')">
@@ -449,11 +510,12 @@
             <div class="slide-overlay"></div>
             <div class="slide-content-box">
                 <div class="step-number">03</div>
-                <h2>La Verdadera Recompensa</h2>
-                <p>¿Quién me mandaría meterme en esto? Fue por el código? O por volver realidad una idea? ver lo
-                    abstracto
-                    volverse real. Aprendí que el esfuerzo es la única moneda de cambio para la comprensión. A mayor
-                    disciplina, mayor claridad sobre cómo funciona el mundo digital.</p>
+                <h2>Redefiniendo el Valor</h2>
+                <p>Volví al origen: ¿por qué empecé? No por amor a la sintaxis, sino por la capacidad de
+                    <strong>construir</strong>. Entendí que la "artesanía" del código es solo una herramienta, no el
+                    fin. Al revisar mis valores, vi que no había perdido nada: esos años de disciplina y "picar piedra"
+                    son hoy el cimiento que me da <strong>criterio</strong>.
+                </p>
             </div>
         </div>
 
@@ -463,8 +525,9 @@
             <div class="slide-content-box">
                 <div class="step-number">04</div>
                 <h2>Catalizador Cognitivo</h2>
-                <p>Mis herramientas técnicas no desaparecen; ahora sirven para dar <strong>mejores
-                        instrucciones</strong>. La IA actúa como un amplificador: mi conocimiento del código es el
+                <p>Las herramientas técnicas no desaparecen; ahora sirven para dar <strong>mejores
+                        instrucciones</strong>.<br> La IA actúa como un <strong>amplificador</strong>: mi conocimiento
+                    del código es el
                     lenguaje que uso para guiar a la máquina con precisión quirúrgica.</p>
             </div>
         </div>
@@ -512,6 +575,29 @@
     </div>
 
     <script>
+        // --- MUSIC PLAYER ---
+        const music = document.getElementById('bg-music');
+        const musicBtn = document.querySelector('.music-btn');
+
+        // Establecer volumen inicial
+        music.volume = 0.5;
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play().then(() => {
+                    musicBtn.classList.add('playing');
+                    musicBtn.innerHTML = '❚❚ PAUSE';
+                }).catch(error => {
+                    console.error("Error al reproducir:", error);
+                    alert("Por favor, asegúrate de que el archivo 'soundtrack.mp3' está en la carpeta 'audio'.");
+                });
+            } else {
+                music.pause();
+                musicBtn.classList.remove('playing');
+                musicBtn.innerHTML = '🎵 PLAY MUSIC';
+            }
+        }
+
         function handleOptionClick(event, sectionId, color) {
             // Crear elemento explosión
             const explosion = document.createElement('div');
