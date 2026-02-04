@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación IA - Héctor</title>
+    <style>
+        /* --- ESTILOS GENERALES (CYBERPUNK / FUTURISTA) --- */
+        :root {
+            --bg-color: #000000;
+            /* Negro puro */
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-orange: #f97316;
+            /* Color Bola Dragón */
+            --accent-blue: #38bdf8;
+            /* Color Cerebro Digital */
+            --neon-glow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100%;
+            overflow: hidden;
+            /* Evita scroll bars en la home */
+        }
+
+        /* --- PANTALLA DE INICIO (SPLIT SCREEN) --- */
+        #home-screen {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            transition: transform 0.8s ease-in-out;
+            background-image: url('./images/Dragon.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .option-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .option-container:hover {
+            flex: 1.2;
+            /* El lado seleccionado crece */
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Títulos de las opciones */
+        h2 {
+            font-size: 3.5rem;
+            margin-top: 30px;
+            text-transform: none;
+            letter-spacing: 3px;
+            font-weight: 800;
+            color: #ffffff;
+            transition: all 0.3s;
+            /* Efecto Llama / Contraste */
+            text-shadow:
+                0 0 5px #000,
+                0 0 10px #000,
+                0 0 20px #ff7b00,
+                0 0 30px #ff0000;
+        }
+
+        .option-container:hover h2 {
+            transform: scale(1.05);
+            text-shadow:
+                0 0 5px #000,
+                0 0 10px #000,
+                0 0 20px #ff9d00,
+                0 0 40px #ff4500,
+                0 0 60px #ff0000;
+        }
+
+        /* --- ICONOS SVG --- */
+        svg,
+        img.dragon-ball,
+        img.brain-img {
+            width: 250px;
+            height: 250px;
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        img.dragon-ball,
+        img.brain-img {
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .option-container:hover svg,
+        .option-container:hover img.dragon-ball,
+        .option-container:hover img.brain-img {
+            transform: scale(1.1);
+        }
+
+        /* Efecto Explosión */
+        .explosion-ripple {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(249, 115, 22, 1) 0%, rgba(249, 115, 22, 0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+            animation: explode 0.8s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+
+            100% {
+                width: 2000px;
+                height: 2000px;
+                opacity: 0;
+            }
+        }
+
+        /* --- SECCIONES DE CONTENIDO (OCULTAS AL INICIO) --- */
+        .content-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            padding: 50px;
+            box-sizing: border-box;
+            transform: translateY(100%);
+            /* Oculto abajo */
+            transition: transform 0.6s ease-out;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .content-section.active {
+            transform: translateY(0);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .slide-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        h1.slide-title {
+            font-size: 3rem;
+            border-bottom: 2px solid;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        p.slide-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        /* ESTILOS DEL SLIDER */
+        .slider-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Centra el texto */
+        }
+
+        .slide.active-slide {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-image-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            filter: brightness(0.4);
+            /* Oscurece la imagen para leer texto */
+        }
+
+        .slide-content-box {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            text-align: center;
+            padding: 40px;
+            background: rgba(15, 23, 42, 0.8);
+            /* Fondo semitransparente */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            animation: floatUp 0.8s forwards;
+        }
+
+        @keyframes floatUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* Aplica la animación solo cuando el slide está activo */
+        .slide.active-slide .slide-image-bg {
+            animation: intenseZoomFade 20s ease-out forwards;
+        }
+
+        @keyframes intenseZoomFade {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            60% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0.6;
+            }
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent-orange);
+            opacity: 0.5;
+            margin-bottom: -20px;
+            display: block;
+        }
+
+        .slide-content-box h2 {
+            font-size: 3rem;
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+        }
+
+        .slide-content-box p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-content-box.hidden-box {
+            opacity: 0;
+            /* Mantenemos pointer-events activos para poder clicar y volver a mostrarla */
+            transition: opacity 0.5s ease;
+        }
+
+        /* BOTONES DE NAV */
+        .slider-nav {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .slider-nav button {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-nav button:hover {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .dot {
+            height: 12px;
+            width: 12px;
+            background-color: #555;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: var(--accent-orange);
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="home-screen">
+        <div class="option-container" onclick="handleOptionClick(event, 'section-personal', 'orange')">
+            <img src="./images/DragonBall_neutral.png" class="dragon-ball" alt="Bola de Dragón 4 Estrellas">
+            <h2>Viaje Personal</h2>
+        </div>
+
+        <div class="option-container" onclick="handleOptionClick(event, 'section-project', 'blue')">
+            <img src="./images/Cerebro_manga.png" class="brain-img" alt="Cerebro Digital">
+            <h2>Smart Vision</h2>
+        </div>
+    </div>
+
+    <div id="section-personal" class="content-section" style="padding: 0; overflow: hidden;">
+        <button class="back-btn" onclick="closeSection('section-personal')" style="z-index: 100;">← Volver</button>
+
+        <div class="slider-container">
+
+            <div class="slide active-slide" id="slide-0">
+                <div class="slide-image-bg" style="background-image: url('./images/Craftsman.avif');">
+                </div>
+                <div class="slide-overlay"></div>
+                <div class="slide-content-box">
+                    <div class="step-number">00</div>
+                    <h2>Old Code Developer</h2>
+                    <div
+                        style="text-align: left; background: #0d1117; padding: 20px; border-radius: 8px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.9rem; color: #e6edf3; border: 1px solid #30363d; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                        <span style="color: #ff7b72;">local procedure</span> <span
+                            style="color: #d2a8ff;">PostDocument</span>(DocHeader: Record <span
+                            style="color: #a5d6ff;">"Sales Header"</span>)<br>
+                        <span style="color: #ff7b72;">var</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;Lines: Record <span style="color: #a5d6ff;">"Sales Line"</span>;<br><br>
+                        <span style="color: #ff7b72;">begin</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #8b949e;">// The art of hand-crafted
+                            logic</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;Lines.SetRange(<span style="color: #a5d6ff;">"Document No."</span>,
+                        DocHeader.<span style="color: #a5d6ff;">"No."</span>);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ff7b72;">if</span> Lines.FindSet() <span
+                            style="color: #ff7b72;">then</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ff7b72;">repeat</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidateLine(Lines);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ff7b72;">until</span>
+                        Lines.Next() = 0;<br>
+                        <span style="color: #ff7b72;">end</span>;
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-1">
+                <div class="slide-image-bg" style="background-image: url('./images/Tsunami.avif');"></div>
+                <div class="slide-overlay"></div>
+                <div class="slide-content-box">
+                    <div class="step-number">01</div>
+                    <h2>¿El Fin del Intérprete?</h2>
+                    <p>Fue un <strong>choque de realidad</strong>. De pronto, la máquina entendía <i>lenguaje
+                            natural</i>.<br>Mi primera duda fue <strong>existencial</strong>: si ya no necesito traducir
+                        ideas a sintaxis compleja,
+                        ¿sigue teniendo valor mi trabajo?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-2">
+            <div class="slide-image-bg" style="background-image: url('./images/Depressed.png');"></div>
+            <div class="slide-overlay"></div>
+            <div class="slide-content-box">
+                <div class="step-number">02</div>
+                <h2>La "Fase Negra"</h2>
+                <p>Sentí un duelo real. Miré atrás: la ingeniería, las renuncias personales, los años invirtiendo en
+                    una artesanía difícil.<br>La pregunta dolió: <strong>"¿Para qué?"</strong>. Si la máquina lo
+                    hace en
+                    segundos, sentí que todo mi sacrificio perdía su valor.</p>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-3">
+            <div class="slide-image-bg" style="background-image: url('./images/Goku_exercise.png');"></div>
+            <div class="slide-overlay"></div>
+            <div class="slide-content-box">
+                <div class="step-number">03</div>
+                <h2>La Verdadera Recompensa</h2>
+                <p>¿Quién me mandaría meterme en esto? Fue por el código? O por volver realidad una idea? ver lo
+                    abstracto
+                    volverse real. Aprendí que el esfuerzo es la única moneda de cambio para la comprensión. A mayor
+                    disciplina, mayor claridad sobre cómo funciona el mundo digital.</p>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-4">
+            <div class="slide-image-bg" style="background-image: url('./images/Goku_tools.png');"></div>
+            <div class="slide-overlay"></div>
+            <div class="slide-content-box">
+                <div class="step-number">04</div>
+                <h2>Catalizador Cognitivo</h2>
+                <p>Mis herramientas técnicas no desaparecen; ahora sirven para dar <strong>mejores
+                        instrucciones</strong>. La IA actúa como un amplificador: mi conocimiento del código es el
+                    lenguaje que uso para guiar a la máquina con precisión quirúrgica.</p>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-5">
+            <div class="slide-image-bg" style="background-image: url('./images/Goku_ultra.png');"></div>
+            <div class="slide-overlay"></div>
+            <div class="slide-content-box">
+                <div class="step-number">05</div>
+                <h2>El Shift Mental</h2>
+                <p>Es un cambio fundamental de perspectiva. Dejo de obsesionarme con la implementación para enfocarme en
+                    la <strong>orquestación</strong>. Es un estado de flujo donde la barrera técnica se disuelve y la
+                    solución se materializa a la velocidad del pensamiento.</p>
+            </div>
+        </div>
+
+        <div class="slider-nav">
+            <button id="slider-prev-btn" onclick="prevSlide()">❮ Anterior</button>
+            <div class="dots">
+                <span class="dot active" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+                <span class="dot" onclick="goToSlide(3)"></span>
+                <span class="dot" onclick="goToSlide(4)"></span>
+                <span class="dot" onclick="goToSlide(5)"></span>
+            </div>
+            <button id="slider-next-btn" onclick="nextSlide()">Siguiente ❯</button>
+        </div>
+    </div>
+    </div>
+
+    <div id="section-project" class="content-section">
+        <button class="back-btn" onclick="closeSection('section-project')">← Volver al Inicio</button>
+        <div class="slide-content">
+            <h1 class="slide-title" style="color: var(--accent-blue);">IM Projects: Gemini Vision</h1>
+            <p class="slide-text">
+                <strong>El Concepto: Módulo Cognitivo Externo</strong><br>
+                Usamos la IA como un módulo extra de razonamiento conectado a nuestra empresa.<br><br>
+                <strong>El Proyecto: Reconocimiento de Albaranes</strong><br>
+                Problema: Papeles arrugados, escritura manual, caos.<br>
+                Solución: Gemini procesa la imagen -> JSON Estructurado -> ERP.<br><br>
+                <strong>Resultado:</strong> Flujo orgánico de negocio.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function handleOptionClick(event, sectionId, color) {
+            // Crear elemento explosión
+            const explosion = document.createElement('div');
+            explosion.classList.add('explosion-ripple');
+
+            // Posicionar en el click
+            const rect = event.currentTarget.getBoundingClientRect();
+
+            // Si quieres que salga del CENTRO del elemento clicado (mejor efecto)
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            explosion.style.left = x + 'px';
+            explosion.style.top = y + 'px';
+
+            // Ajustar el color según la opción
+            if (color === 'blue') {
+                explosion.style.background = 'radial-gradient(circle, rgba(56, 189, 248, 1) 0%, rgba(56, 189, 248, 0) 70%)';
+            }
+
+            document.body.appendChild(explosion);
+
+            // Esperar a que la explosión cubra un poco antes de cambiar
+            setTimeout(() => {
+                openSection(sectionId);
+                // Limpiar elemento
+                setTimeout(() => explosion.remove(), 1000);
+            }, 400); // 400ms de retraso
+        }
+
+        function openSection(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeSection(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(n) {
+            // Reset
+            slides.forEach(s => s.classList.remove('active-slide'));
+            dots.forEach(d => d.classList.remove('active'));
+
+            // Lógica circular
+            if (n >= slides.length) currentSlide = 0;
+            else if (n < 0) currentSlide = slides.length - 1;
+            else currentSlide = n;
+
+            // Activar
+            slides[currentSlide].classList.add('active-slide');
+            dots[currentSlide].classList.add('active');
+
+            // Actualizar botón Siguiente/Fin
+            const nextBtn = document.getElementById('slider-next-btn');
+            if (nextBtn) {
+                if (currentSlide === slides.length - 1) {
+                    nextBtn.innerText = "Fin ↺";
+                } else {
+                    nextBtn.innerText = "Siguiente ❯";
+                }
+            }
+
+            // Ocultar botón Anterior en la primera slide
+            const prevBtn = document.getElementById('slider-prev-btn');
+            if (prevBtn) {
+                prevBtn.style.visibility = (currentSlide === 0) ? 'hidden' : 'visible';
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide === slides.length - 1) {
+                closeSection('section-personal');
+                // Resetear al inicio tras la transición de cierre (600ms)
+                setTimeout(() => {
+                    goToSlide(0);
+                }, 600);
+            } else {
+                showSlide(currentSlide + 1);
+            }
+        }
+        function prevSlide() { showSlide(currentSlide - 1); }
+        function goToSlide(n) { showSlide(n); }
+
+        // Ocultar la caja de texto al hacer click sobre ella
+        document.querySelectorAll('.slide-content-box').forEach(box => {
+            box.addEventListener('click', function (e) {
+                // Evitar que el click se propague si fuera necesario, 
+                // pero aquí queremos solo ocultar esta caja
+                this.classList.toggle('hidden-box');
+            });
+        });
+
+        // Inicializar estado (ocultar botón anterior al inicio)
+        showSlide(0);
+    </script>
+</body>
+
+</html>
